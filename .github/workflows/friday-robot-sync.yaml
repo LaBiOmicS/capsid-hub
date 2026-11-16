@@ -1,0 +1,96 @@
+name: 🤖 Friday Capsid Robot (Bioconda & BioContainers Harvester)
+
+on:
+  schedule:
+    # Runs every Friday at 04:00 UTC
+    - cron: '0 4 * * 5'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Lookback window in days'
+        required: false
+        default: '7'
+      limit:
+        description: 'Maximum number of tools to ingest'
+        required: false
+        default: '10'
+      dry_run:
+        description: 'Simulate without creating Pull Request'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  harvest-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Capsid Hub
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚡ Set up uv & Python
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: ⚙️ Install Capsid CLI Engine
+        run: |
+          uv tool install git+https://github.com/capsid/capsid.git || pip install git+https://github.com/capsid/capsid.git
+
+      - name: 🤖 Run Capsid Robot Harvester
+        id: run_bot
+        run: |
+          DAYS="${{ github.event.inputs.days || '7' }}"
+          LIMIT="${{ github.event.inputs.limit || '10' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}"
+
+          echo "Running Capsid Robot with lookback $DAYS days and limit $LIMIT tools..."
+          capsid bot sync \
+            --days "$DAYS" \
+            --limit "$LIMIT" \
+            --recipes-dir recipes \
+            --catalog catalog.json \
+            --report pr-report.md \
+            $DRY_RUN
+
+      - name: 🛡️ Audit & Lint Community Recipes
+        run: |
+          capsid lint recipes/
+
+      - name: 📚 Update Web Catalog and Documentation
+        run: |
+          capsid catalog --dir recipes/ --out catalog.json
+          capsid docs --dir recipes/ --catalog catalog.json --out-dir .
+
+      - name: 🔍 Check for New Recipes
+        id: git_status
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain recipes/)" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 🚀 Open Pull Request with New Recipes
+        if: steps.git_status.outputs.has_changes == 'true' && github.event.inputs.dry_run != 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(robot): ingest latest tools from Bioconda and BioContainers"
+          branch: "robot/upstream-sync"
+          delete-branch: true
+          title: "🤖 Weekly Ingest: New Tools & Updates from Bioconda / BioContainers"
+          body-path: pr-report.md
+          labels: |
+            robot
+            automated-ingest
+            bioconda
+            biocontainers
+          draft: false

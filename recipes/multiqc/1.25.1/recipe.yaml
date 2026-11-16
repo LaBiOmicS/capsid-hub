@@ -1,0 +1,34 @@
+name: multiqc
+version: 1.25.1
+description: Create aggregate bioinformatics analysis reports across many samples
+  and tools
+homepage: https://pypi.org/project/multiqc/
+license: GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+categories:
+- bioinformatics
+- genomics
+- python
+platforms:
+- linux/amd64
+- linux/arm64
+build:
+  type: uv-pypi
+  package: multiqc==1.25.1
+  python_version: '3.12'
+  conda_packages: []
+  channels:
+  - conda-forge
+  - bioconda
+  configure_args: []
+  cmake_args: []
+  build_commands: []
+  dependencies:
+    build:
+    - build-essential
+    run: []
+  env: {}
+test:
+  command: python -c 'import multiqc; print("multiqc OK")'
+  expected_output: multiqc OK
+  expected_exit_code: 0
+labels: {}

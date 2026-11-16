@@ -1,0 +1,74 @@
+name: Capsid Hub Container Publisher
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'recipes/**'
+
+permissions:
+  contents: write
+  packages: write
+  pages: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install Capsid CLI
+        run: |
+          uv tool install git+https://github.com/capsid/capsid.git
+
+      - name: Set up QEMU (Multi-Architecture)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect Newly Merged Recipes
+        id: merged-recipes
+        run: |
+          # Any change in a recipe directory (recipe.yaml or its lockfiles) republishes that recipe
+          CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '^recipes/[^/]+/[^/]+/' | cut -d/ -f1-3 | sort -u \
+            | while read -r d; do [ -f "$d/recipe.yaml" ] && echo "$d/recipe.yaml"; done | tr '\n' ' ' || true)
+          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Multi-Arch Images
+        run: |
+          for file in ${{ steps.merged-recipes.outputs.files }}; do
+            TOOL=$(echo $(basename $(dirname $(dirname $file))) | tr '[:upper:]' '[:lower:]')
+            VER=$(basename $(dirname $file))
+            TAG="ghcr.io/${{ github.repository_owner }}/${TOOL}:${VER}"
+            echo "🚀 Building, validating, and pushing container for $file to $TAG..."
+            capsid build "$file" --tag "$TAG" --push
+          done
+
+      - name: Rebuild Central Catalog
+        run: |
+          capsid catalog --dir recipes --out catalog.json
+
+      - name: Commit Updated Catalog
+        run: |
+          git config user.name "capsid-bot"
+          git config user.email "bot@capsid.io"
+          git add catalog.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(catalog): update central catalog [skip ci]" && git push)

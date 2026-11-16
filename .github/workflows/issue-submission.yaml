@@ -1,0 +1,92 @@
+name: Convert Web Issue to Pull Request
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  process-issue:
+    if: contains(github.event.issue.labels.*.name, 'new-recipe')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv & Capsid
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install Capsid CLI
+        run: |
+          uv tool install git+https://github.com/capsid/capsid.git
+
+      - name: Extract Recipe from Issue
+        id: extract
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const body = context.payload.issue.body;
+            
+            // Extract YAML code block
+            const match = body.match(/```(?:yaml)?\s*([\s\S]*?)```/);
+            if (!match) {
+              core.setFailed("No valid YAML block found in issue body.");
+              return;
+            }
+            const yamlContent = match[1].trim();
+            
+            // Extract name and version with regex
+            const nameMatch = yamlContent.match(/^name:\s*['"]?([a-zA-Z0-9_-]+)['"]?/m);
+            const verMatch = yamlContent.match(/^version:\s*['"]?([^'"\s]+)['"]?/m);
+            
+            if (!nameMatch || !verMatch) {
+              core.setFailed("Could not extract tool name or version from recipe YAML.");
+              return;
+            }
+            
+            const tool = nameMatch[1].toLowerCase();
+            const ver = verMatch[1];
+            
+            const targetDir = path.join('recipes', tool, ver);
+            fs.mkdirSync(targetDir, { recursive: true });
+            const filePath = path.join(targetDir, 'recipe.yaml');
+            fs.writeFileSync(filePath, yamlContent);
+            
+            core.setOutput('tool', tool);
+            core.setOutput('version', ver);
+            core.setOutput('file_path', filePath);
+
+      - name: Security & Integrity Audit
+        run: |
+          capsid lint "${{ steps.extract.outputs.file_path }}" --catalog catalog.json
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Container Compilation
+        run: |
+          capsid build "${{ steps.extract.outputs.file_path }}" --test
+
+      - name: Create Pull Request from Issue
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(recipe): add ${{ steps.extract.outputs.tool }} ${{ steps.extract.outputs.version }} from issue #${{ github.event.issue.number }}"
+          branch: "issue-${{ github.event.issue.number }}"
+          title: "feat(recipe): add ${{ steps.extract.outputs.tool }} ${{ steps.extract.outputs.version }}"
+          body: |
+            Closes #${{ github.event.issue.number }}
+            
+            Submitted by @${{ github.event.issue.user.login }} via Web Form.
+            - **Tool:** `${{ steps.extract.outputs.tool }}`
+            - **Version:** `${{ steps.extract.outputs.version }}`
+            - **Audit:** Passed
+            - **Build & Test:** Passed

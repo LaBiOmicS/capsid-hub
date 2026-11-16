@@ -1,0 +1,10 @@
+name: dna-seq-stack
+version: 1.0.0
+description: Combined BWA read aligner and Samtools BAM processor for high-throughput DNA sequencing
+components:
+  - recipe: bwa
+    version: "0.7.19"
+  - recipe: samtools
+    version: "1.25"
+test:
+  command: bwa 2>&1 | grep "index sequences in the" && samtools --version

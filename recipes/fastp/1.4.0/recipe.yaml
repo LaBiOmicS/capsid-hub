@@ -1,0 +1,30 @@
+name: fastp
+version: 1.4.0
+description: A ultra-fast FASTQ preprocessor with full features (QC/adapters/trimming/filtering/splitting...).
+homepage: https://github.com/OpenGene/fastp
+license: MIT
+categories:
+- bioinformatics
+- bioconda-migrated
+platforms:
+- linux/amd64
+- linux/arm64
+build:
+  type: pixi-conda
+  python_version: '3.12'
+  conda_packages:
+  - fastp==1.4.0
+  channels:
+  - conda-forge
+  - bioconda
+  configure_args: []
+  cmake_args: []
+  build_commands: []
+  dependencies:
+    build: []
+    run: []
+  env: {}
+test:
+  command: fastp --help
+  expected_exit_code: 0
+labels: {}

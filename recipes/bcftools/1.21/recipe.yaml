@@ -1,0 +1,30 @@
+name: bcftools
+version: '1.21'
+description: BCFtools, utilities for manipulating variant calls in VCF and BCF formats.
+homepage: https://github.com/samtools/bcftools
+license: GPL-3.0-or-later
+categories:
+- bioinformatics
+- bioconda-migrated
+platforms:
+- linux/amd64
+- linux/arm64
+build:
+  type: pixi-conda
+  python_version: '3.12'
+  conda_packages:
+  - bcftools==1.21
+  channels:
+  - conda-forge
+  - bioconda
+  configure_args: []
+  cmake_args: []
+  build_commands: []
+  dependencies:
+    build: []
+    run: []
+  env: {}
+test:
+  command: bcftools -h
+  expected_exit_code: 0
+labels: {}

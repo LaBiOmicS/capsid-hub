@@ -1,0 +1,30 @@
+name: minimap2
+version: '2.28'
+description: A versatile pairwise aligner for genomic and spliced nucleotide sequences.
+homepage: https://github.com/lh3/minimap2
+license: MIT
+categories:
+- bioinformatics
+- bioconda-migrated
+platforms:
+- linux/amd64
+- linux/arm64
+build:
+  type: pixi-conda
+  python_version: '3.12'
+  conda_packages:
+  - minimap2==2.28
+  channels:
+  - conda-forge
+  - bioconda
+  configure_args: []
+  cmake_args: []
+  build_commands: []
+  dependencies:
+    build: []
+    run: []
+  env: {}
+test:
+  command: minimap2 2>&1 | grep 'Usage'
+  expected_exit_code: 0
+labels: {}

@@ -1,0 +1,34 @@
+name: cutadapt
+version: '5.2'
+description: Adapter trimming and other preprocessing of high-throughput sequencing
+  reads
+homepage: https://pypi.org/project/cutadapt/
+license: MIT
+categories:
+- bioinformatics
+- genomics
+- python
+platforms:
+- linux/amd64
+- linux/arm64
+build:
+  type: uv-pypi
+  package: cutadapt==5.2
+  python_version: '3.12'
+  conda_packages: []
+  channels:
+  - conda-forge
+  - bioconda
+  configure_args: []
+  cmake_args: []
+  build_commands: []
+  dependencies:
+    build:
+    - build-essential
+    run: []
+  env: {}
+test:
+  command: python -c 'import cutadapt; print("cutadapt OK")'
+  expected_output: cutadapt OK
+  expected_exit_code: 0
+labels: {}

@@ -1,0 +1,10 @@
+name: qc-stack
+version: 1.0.0
+description: Combined Fast all-in-one FASTQ preprocessor (fastp) and QC report aggregator (MultiQC)
+components:
+  - recipe: fastp
+    version: "1.4.0"
+  - recipe: multiqc
+    version: "1.25.1"
+test:
+  command: fastp --help && multiqc --version

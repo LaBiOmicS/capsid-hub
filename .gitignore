@@ -1,0 +1,15 @@
+# Environments
+.venv/
+__pycache__/
+
+# Build outputs
+.capsid-build/
+*.sif
+*.tar.gz
+build/
+dist/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

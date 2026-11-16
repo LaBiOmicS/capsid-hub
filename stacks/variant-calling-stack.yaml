@@ -1,0 +1,10 @@
+name: variant-calling-stack
+version: 1.0.0
+description: Combined Samtools and BCFtools toolkit for variant calling and VCF manipulation
+components:
+  - recipe: samtools
+    version: "1.25"
+  - recipe: bcftools
+    version: "1.25"
+test:
+  command: samtools --version && bcftools --version
