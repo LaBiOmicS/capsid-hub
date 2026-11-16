@@ -22,7 +22,7 @@ on:
 
 env:
   # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
-  CAPSID_REF: c5bd61f2b0319fd5da12de97bce55a3c5619f704
+  CAPSID_REF: 7028c3a0a4efb3b2098efb784a945046d27cbb74
 
 permissions:
   contents: write
@@ -33,12 +33,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout Capsid Hub
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
 
       - name: ⚡ Set up uv & Python
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@caf0cab7a618c569241d31dcd442f54681755d39 # v3.2.4
         with:
           version: "latest"
           enable-cache: true
@@ -63,7 +63,7 @@ jobs:
             --recipes-dir recipes \
             --catalog catalog.json \
             --report pr-report.md \
-            $DRY_RUN
+            ${DRY_RUN:+"$DRY_RUN"}
 
       - name: 🛡️ Audit & Lint Community Recipes
         run: |
@@ -86,7 +86,7 @@ jobs:
 
       - name: 🚀 Open Pull Request with New Recipes
         if: steps.git_status.outputs.has_changes == 'true' && github.event.inputs.dry_run != 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "feat(robot): ingest latest tools from Bioconda and BioContainers"

@@ -9,7 +9,7 @@ on:
 
 env:
   # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
-  CAPSID_REF: c5bd61f2b0319fd5da12de97bce55a3c5619f704
+  CAPSID_REF: 7028c3a0a4efb3b2098efb784a945046d27cbb74
 
 permissions:
   contents: read
@@ -18,11 +18,11 @@ jobs:
   audit-and-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
 
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@caf0cab7a618c569241d31dcd442f54681755d39 # v3.2.4
 
       - name: Install Capsid CLI
         run: uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
@@ -43,21 +43,21 @@ jobs:
                    | sort -u | while read -r f; do [ -f "$f" ] && echo "$f"; done || true)
           ok='^(recipes/[a-z0-9._-]+/[A-Za-z0-9._+-]+/recipe\.yaml|stacks/[a-z0-9._-]+\.yaml)$'
           for f in $recipes $stacks; do [[ "$f" =~ $ok ]] || { echo "::error::unexpected path $f"; exit 1; }; done
-          echo "recipes=$(echo $recipes)" >> "$GITHUB_OUTPUT"
-          echo "stacks=$(echo $stacks)" >> "$GITHUB_OUTPUT"
+          echo "recipes=$(tr '\n' ' ' <<< "$recipes")" >> "$GITHUB_OUTPUT"
+          echo "stacks=$(tr '\n' ' ' <<< "$stacks")" >> "$GITHUB_OUTPUT"
           echo "Recipes: $recipes"; echo "Stacks: $stacks"
 
       - name: Security & schema audit (lint)
         env:
-          RECIPES: ${{ steps.changed.outputs.recipes }}
+          TARGETS: ${{ steps.changed.outputs.recipes }} ${{ steps.changed.outputs.stacks }}
         run: |
-          for file in $RECIPES; do
+          for file in $TARGETS; do
             echo "::group::Auditing $file"
             capsid lint "$file" --catalog catalog.json
             echo "::endgroup::"
           done
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Build & test changed containers
         env:
@@ -73,7 +73,7 @@ jobs:
       - name: Post approval status comment
         if: success()
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           TARGETS: ${{ steps.changed.outputs.recipes }} ${{ steps.changed.outputs.stacks }}
         with:

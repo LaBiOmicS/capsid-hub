@@ -3,7 +3,7 @@ version: 1.25.1
 description: Create aggregate bioinformatics analysis reports across many samples
   and tools
 homepage: https://pypi.org/project/multiqc/
-license: GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+license: GPL-3.0-only
 categories:
 - bioinformatics
 - genomics

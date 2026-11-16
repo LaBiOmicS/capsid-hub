@@ -3,7 +3,8 @@
     "StackComponent": {
       "properties": {
         "recipe": {
-          "description": "Path or name of recipe to include",
+          "description": "Recipe name, as in recipes/<name>/<version>/recipe.yaml",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
           "title": "Recipe",
           "type": "string"
         },
@@ -17,7 +18,8 @@
             }
           ],
           "default": null,
-          "description": "Override version if using catalog name",
+          "description": "Recipe version (default: the highest version available)",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$",
           "title": "Version"
         }
       },
@@ -44,7 +46,8 @@
             }
           ],
           "default": null,
-          "description": "Expected SHA-256 checksum of generated output file",
+          "description": "Expected SHA-256 of output_file",
+          "pattern": "^\\s*[0-9a-fA-F]{64}\\s*$",
           "title": "Expected Checksum"
         },
         "expected_exit_code": {
@@ -70,7 +73,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Test input files (filename -> inline content)",
+          "description": "Input files written to the test working directory /test (relative path -> inline content)",
           "title": "Files",
           "type": "object"
         },
@@ -84,7 +87,7 @@
             }
           ],
           "default": null,
-          "description": "Output file path to verify checksum",
+          "description": "File (relative to /test) the command must produce",
           "title": "Output File"
         },
         "random_seed": {
@@ -97,8 +100,15 @@
             }
           ],
           "default": null,
-          "description": "Fixed random seed for deterministic execution",
+          "description": "Exported as CAPSID_RANDOM_SEED and PYTHONHASHSEED for deterministic runs",
           "title": "Random Seed"
+        },
+        "timeout": {
+          "default": 60,
+          "description": "Seconds before the test is aborted",
+          "minimum": 1,
+          "title": "Timeout",
+          "type": "integer"
         }
       },
       "required": [

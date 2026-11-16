@@ -39,7 +39,7 @@
             }
           ],
           "default": null,
-          "description": "Precompiled binary URL for x86_64",
+          "description": "Precompiled binary or archive URL for linux/amd64 (type: binary)",
           "title": "Binary Url Amd64"
         },
         "binary_url_arm64": {
@@ -52,7 +52,7 @@
             }
           ],
           "default": null,
-          "description": "Precompiled binary URL for aarch64",
+          "description": "Precompiled binary or archive URL for linux/arm64 (type: binary)",
           "title": "Binary Url Arm64"
         },
         "build_commands": {
@@ -67,8 +67,16 @@
               "type": "null"
             }
           ],
-          "description": "Custom shell build commands",
+          "description": "Shell commands that replace the default build steps, run in the unpacked source (source types and binary)",
           "title": "Build Commands"
+        },
+        "cargo_args": {
+          "description": "Extra arguments for cargo install (type: rust-cargo)",
+          "items": {
+            "type": "string"
+          },
+          "title": "Cargo Args",
+          "type": "array"
         },
         "channels": {
           "anyOf": [
@@ -82,6 +90,7 @@
               "type": "null"
             }
           ],
+          "description": "Conda channels, in priority order",
           "title": "Channels"
         },
         "cmake_args": {
@@ -96,7 +105,7 @@
               "type": "null"
             }
           ],
-          "description": "Extra arguments for cmake",
+          "description": "Extra arguments for the cmake configure step (type: cmake)",
           "title": "Cmake Args"
         },
         "conda_packages": {
@@ -111,7 +120,7 @@
               "type": "null"
             }
           ],
-          "description": "Conda packages for Pixi",
+          "description": "Conda match specs, e.g. 'samtools==1.25' (type: pixi-conda)",
           "title": "Conda Packages"
         },
         "configure_args": {
@@ -126,7 +135,7 @@
               "type": "null"
             }
           ],
-          "description": "Extra arguments for ./configure",
+          "description": "Extra arguments for ./configure (type: autotools)",
           "title": "Configure Args"
         },
         "dependencies": {
@@ -136,7 +145,7 @@
             },
             "type": "array"
           },
-          "description": "System apt/apk package dependencies separated by build-time and runtime",
+          "description": "Debian packages: 'build' installed in the builder stage, 'run' in the runtime image",
           "title": "Dependencies",
           "type": "object"
         },
@@ -144,7 +153,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Environment variables to set in container",
+          "description": "Environment variables set in the runtime image",
           "title": "Env",
           "type": "object"
         },
@@ -158,7 +167,7 @@
             }
           ],
           "default": null,
-          "description": "Destination prefix (default: /opt/<name>)",
+          "description": "Installation prefix copied to the runtime image (default: /opt/<name>)",
           "title": "Install Prefix"
         },
         "package": {
@@ -171,7 +180,7 @@
             }
           ],
           "default": null,
-          "description": "PyPI package specifier, e.g. 'cutadapt==4.9'",
+          "description": "PyPI requirement, e.g. 'cutadapt==5.2' (type: uv-pypi)",
           "title": "Package"
         },
         "python_version": {
@@ -184,7 +193,7 @@
             }
           ],
           "default": "3.12",
-          "description": "Python version to use",
+          "description": "Python version of the virtual environment (type: uv-pypi)",
           "title": "Python Version"
         },
         "sha256": {
@@ -197,9 +206,37 @@
             }
           ],
           "default": null,
-          "description": "SHA256 checksum of source archive",
+          "description": "SHA-256 of the source archive; required with 'source'",
           "pattern": "^\\s*[0-9a-fA-F]{64}\\s*$",
           "title": "Sha256"
+        },
+        "sha256_amd64": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SHA256 of binary_url_amd64",
+          "pattern": "^\\s*[0-9a-fA-F]{64}\\s*$",
+          "title": "Sha256 Amd64"
+        },
+        "sha256_arm64": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SHA256 of binary_url_arm64",
+          "pattern": "^\\s*[0-9a-fA-F]{64}\\s*$",
+          "title": "Sha256 Arm64"
         },
         "source": {
           "anyOf": [
@@ -211,7 +248,7 @@
             }
           ],
           "default": null,
-          "description": "Source archive or repository URL",
+          "description": "Source archive URL (types: autotools, cmake, make, rust-cargo)",
           "title": "Source"
         },
         "source_date_epoch": {
@@ -239,8 +276,7 @@
         "cmake",
         "make",
         "binary",
-        "rust-cargo",
-        "stack"
+        "rust-cargo"
       ],
       "title": "BuildType",
       "type": "string"
@@ -270,7 +306,8 @@
             }
           ],
           "default": null,
-          "description": "Expected SHA-256 checksum of generated output file",
+          "description": "Expected SHA-256 of output_file",
+          "pattern": "^\\s*[0-9a-fA-F]{64}\\s*$",
           "title": "Expected Checksum"
         },
         "expected_exit_code": {
@@ -296,7 +333,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Test input files (filename -> inline content)",
+          "description": "Input files written to the test working directory /test (relative path -> inline content)",
           "title": "Files",
           "type": "object"
         },
@@ -310,7 +347,7 @@
             }
           ],
           "default": null,
-          "description": "Output file path to verify checksum",
+          "description": "File (relative to /test) the command must produce",
           "title": "Output File"
         },
         "random_seed": {
@@ -323,8 +360,15 @@
             }
           ],
           "default": null,
-          "description": "Fixed random seed for deterministic execution",
+          "description": "Exported as CAPSID_RANDOM_SEED and PYTHONHASHSEED for deterministic runs",
           "title": "Random Seed"
+        },
+        "timeout": {
+          "default": 60,
+          "description": "Seconds before the test is aborted",
+          "minimum": 1,
+          "title": "Timeout",
+          "type": "integer"
         }
       },
       "required": [
@@ -407,7 +451,7 @@
       "additionalProperties": {
         "type": "string"
       },
-      "description": "Custom OCI labels",
+      "description": "Additional OCI image labels",
       "title": "Labels",
       "type": "object"
     },
@@ -425,7 +469,8 @@
       "title": "License"
     },
     "name": {
-      "description": "Canonical tool name, lowercase, e.g. 'samtools'",
+      "description": "Tool name, lowercase; also the image name and recipes/<name>/ directory",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
       "title": "Name",
       "type": "string"
     },
@@ -448,14 +493,15 @@
         }
       ],
       "default": null,
-      "description": "Custom RO-Crate metadata overlay",
+      "description": "Extra JSON-LD properties merged into the RO-Crate root Dataset (e.g. author, funder)",
       "title": "Ro Crate"
     },
     "test": {
       "$ref": "#/$defs/TestConfig"
     },
     "version": {
-      "description": "Tool version, e.g. '1.21'",
+      "description": "Tool version; also the image tag and recipes/<name>/<version>/ directory",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$",
       "title": "Version",
       "type": "string"
     }

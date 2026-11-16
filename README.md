@@ -1,124 +1,139 @@
-# 🌐 Capsid Hub
+# Capsid Hub
 
-> **The community registry and recipe hub for Capsid scientific containers.**  
-> Ultra-slim, hardened, multi-arch bioinformatics containers ready for HPC, Nextflow, Snakemake, and Kubernetes.
+**Community recipes and published images for [Capsid](https://github.com/LaBiOmicS/capsid):
+reproducible, hardened, signed multi-architecture containers for bioinformatics tools.**
 
-[![Audit Workflow](https://img.shields.io/badge/ci-Capsid%20Bot%20Auditor-success.svg)](.github/workflows/pr-audit.yaml)
-[![Registry](https://img.shields.io/badge/registry-ghcr.io%2Flabiomics%2Fcapsid-blue.svg)](https://github.com/orgs/LaBiOmicS/packages)
-[![Hardened](https://img.shields.io/badge/security-rootless%20%7C%20tini-green.svg)](CONTRIBUTING.md)
+[![PR audit](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/pr-audit.yaml/badge.svg)](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/pr-audit.yaml)
+[![Publish](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/publish-release.yaml/badge.svg)](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/publish-release.yaml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
----
+This repository holds the recipes (`recipes/<tool>/<version>/`), multi-tool stacks (`stacks/`), their
+lockfiles, and the pipeline that builds, tests, signs and publishes every image to
+`ghcr.io/labiomics/capsid`.
 
-## 📦 What is Capsid Hub?
-
-Capsid Hub is the open-source repository where scientific container recipes live. Similar to `bioconda-recipes`, but:
-
-1. **Lightweight & Fast**: Individual path-based builds that finish in seconds, avoiding giant monorepo CI queues.
-2. **Automated Security & Duplicate Gate**: Every Pull Request is verified automatically by **Capsid Bot** before merge.
-3. **Hardened Standards**: Every container runs as unprivileged user `bio:1000` with **Tini** PID 1 init.
-4. **Instant OCI Distribution**: Published to `ghcr.io/labiomics/capsid/<tool>:<version>` (stacks: `ghcr.io/labiomics/capsid/<stack>:<version>`) for `linux/amd64` and, when the recipe supports it, `linux/arm64`.
-5. **Signed & Attested**: every image is signed with Sigstore Cosign (keyless, GitHub OIDC) and carries an SPDX SBOM and SLSA build-provenance attestation. Each published digest is pulled back and tested on native amd64 and arm64 runners.
+- **Browse the tools:** [CATALOG.md](CATALOG.md), or the searchable `catalog.html`; machine-readable
+  index in [catalog.json](catalog.json).
+- **Add a tool or version:** [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Report a security issue:** [SECURITY.md](SECURITY.md).
 
 ---
 
-## 🚀 Using Published Images
+## Contents
 
-### With Docker / Podman:
+- [Using the images](#using-the-images)
+- [What every image provides](#what-every-image-provides)
+- [Verifying an image](#verifying-an-image)
+- [How publishing works](#how-publishing-works)
+- [Upstream robot](#upstream-robot)
+- [Repository layout](#repository-layout)
+
+---
+
+## Using the images
 
 ```bash
-docker run --rm ghcr.io/labiomics/capsid/samtools:1.25 samtools --help
-docker run --rm ghcr.io/labiomics/capsid/cutadapt:5.2 cutadapt --version
-docker run --rm ghcr.io/labiomics/capsid/bwa:0.7.19 bwa
+docker run --rm ghcr.io/labiomics/capsid/samtools:1.25 samtools --version
+apptainer exec docker://ghcr.io/labiomics/capsid/samtools:1.25 samtools --version
 ```
 
-### With Nextflow:
+Images are tagged with the tool version, and stacks with the stack version:
+
+```
+ghcr.io/labiomics/capsid/<tool>:<version>
+ghcr.io/labiomics/capsid/<stack>:<version>
+```
+
+Nextflow:
 
 ```groovy
-process ALIGN {
-    container 'ghcr.io/labiomics/capsid/bwa:0.7.19'
-
-    input:
-    path genome
-    path reads
-
-    output:
-    path "aligned.bam"
-
-    script:
-    """
-    bwa mem -t ${task.cpus} ${genome} ${reads} | samtools view -b - > aligned.bam
-    """
+process {
+    withName: 'SAMTOOLS_.*' {
+        container = 'ghcr.io/labiomics/capsid/samtools:1.25'
+    }
 }
 ```
 
-### With Apptainer / Singularity:
+Snakemake:
 
-```bash
-apptainer exec docker://ghcr.io/labiomics/capsid/bwa:0.7.19 bwa
+```python
+rule sort:
+    container: "docker://ghcr.io/labiomics/capsid/samtools:1.25"
+    shell: "samtools sort -o {output} {input}"
 ```
 
----
+Ready-made modules, rules and configurations can be generated with the Capsid CLI
+(`capsid export nextflow samtools@1.25`); see Capsid's
+[workflow integration guide](https://github.com/LaBiOmicS/capsid/blob/main/docs/workflow-integration.md).
+For reproducible pipelines, reference images by digest (`…/samtools@sha256:…`).
 
-## 🔏 Verifying an Image
+## What every image provides
+
+- `linux/amd64` and, when the recipe supports it, `linux/arm64`, under one multi-architecture tag.
+- A numeric non-root user (`1000:1000`), `tini` as PID 1 and read-only tool directories.
+- The complete dependency closure pinned by lockfile; base images and Debian packages pinned by digest
+  and snapshot date.
+- Embedded metadata in `/etc/capsid/`: the recipe, the lockfile, an SPDX SBOM, RO-Crate metadata, a
+  Nextflow module and a Snakemake rule.
+- A Cosign signature, an SBOM attestation and SLSA build provenance.
+- A test run on native amd64 and arm64 machines after publication.
+
+Details: Capsid's [image design](https://github.com/LaBiOmicS/capsid/blob/main/docs/image-design.md)
+and [reproducibility](https://github.com/LaBiOmicS/capsid/blob/main/docs/reproducibility.md) guides.
+
+## Verifying an image
 
 ```bash
 IMAGE=ghcr.io/labiomics/capsid/samtools:1.25
 
-# Cosign signature (keyless, issued to this repository's publish workflow)
 cosign verify "$IMAGE" \
   --certificate-identity-regexp '^https://github.com/LaBiOmicS/capsid-hub/\.github/workflows/publish-release\.yaml@' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 
-# SPDX SBOM attestation
-cosign verify-attestation --type spdxjson "$IMAGE" \
-  --certificate-identity-regexp '^https://github.com/LaBiOmicS/capsid-hub/' \
-  --certificate-oidc-issuer https://token.actions.githubusercontent.com
-
-# SLSA build provenance
 gh attestation verify "oci://$IMAGE" --repo LaBiOmicS/capsid-hub
 ```
 
----
+SBOM attestations, vulnerability scanning and admission control are covered in Capsid's
+[security guide](https://github.com/LaBiOmicS/capsid/blob/main/docs/security.md#verifying-a-published-image).
 
-## 📐 Recipe Schema
+## How publishing works
 
-`schema/recipe.schema.json` and `schema/stack.schema.json` (generated with `capsid schema`) describe the
-YAML format. VS Code picks them up from `.vscode/settings.json`; other editors can use
-`# yaml-language-server: $schema=https://raw.githubusercontent.com/LaBiOmicS/capsid-hub/main/schema/recipe.schema.json`.
+| Step | Workflow | Permissions |
+| :--- | :--- | :--- |
+| A pull request adds or changes a recipe or stack | `pr-audit`: schema check, `capsid lint`, build and test of each changed file | read-only |
+| A recipe is submitted as an issue (form *New recipe*) | `issue-submission`: the recipe is built and tested without write access; if it passes, a pull request is opened | the build job is read-only |
+| A maintainer reviews and merges | | |
+| The merge reaches `main` | `publish-release`: build for every platform, test, push, sign, attest, then pull and test on native amd64 and arm64 runners | `packages: write`, `id-token: write` |
 
----
+The workflows install the Capsid engine from a fixed commit (`CAPSID_REF`). Maintainer tasks are
+described in [docs/maintainers.md](docs/maintainers.md).
 
-## 🔍 Catalog Index
+## Upstream robot
 
-| Tool | Version | Engine | Architectures | License | Recipe Path |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **`bwa`** | `0.7.19` | `pixi-conda` | `amd64`, `arm64` | GPL-3.0-or-later | [recipes/bwa/0.7.19/recipe.yaml](recipes/bwa/0.7.19/recipe.yaml) |
-| **`cutadapt`** | `5.2` | `uv-pypi` | `amd64`, `arm64` | MIT | [recipes/cutadapt/5.2/recipe.yaml](recipes/cutadapt/5.2/recipe.yaml) |
-| **`fastp`** | `1.4.0` | `pixi-conda` | `amd64`, `arm64` | MIT | [recipes/fastp/1.4.0/recipe.yaml](recipes/fastp/1.4.0/recipe.yaml) |
-| **`samtools`** | `1.19` | `pixi-conda` | `amd64`, `arm64` | MIT | [recipes/samtools/1.19/recipe.yaml](recipes/samtools/1.19/recipe.yaml) |
-| **`samtools`** | `1.25` | `pixi-conda` | `amd64`, `arm64` | MIT | [recipes/samtools/1.25/recipe.yaml](recipes/samtools/1.25/recipe.yaml) |
+Every Friday at 04:00 UTC, `friday-robot-sync` checks Bioconda for tools and versions released in the
+previous week, generates Capsid recipes for them, lints them, and opens a pull request with a report.
+Nothing is published until a maintainer reviews and merges that pull request. Existing recipes are
+never modified by the robot.
 
----
+The same check can be run locally:
 
-## 🤖 Friday Upstream Robot (Bioconda & BioContainers Harvester)
-
-O Capsid Hub conta com um robô automatizado (`.github/workflows/friday-robot-sync.yaml`) que roda **toda sexta-feira às 04:00 UTC**:
-1. **Monitoramento Upstream**: Rastreador de novos pacotes e versões lançadas no **Bioconda** e **BioContainers** nos últimos 7 dias.
-2. **Transformação Automática**: Converte pacotes legados para o formato Capsid (`uv-pypi` para Python ou `pixi-conda` para binários), gerando imagens até 80% menores.
-3. **Hardening & Auditoria**: Aplica padrões de segurança (usuário `bio:1000`, `tini`, SBOM) e valida a receita com o `capsid lint`.
-4. **Pull Request Automático**: Abre um PR detalhado com a tabela de ferramentas transformadas e relatório de integridade para a comunidade aprovar.
-
-Você também pode disparar o robô localmente a qualquer momento:
 ```bash
-# Apenas verificar o que há de novo nos últimos 7 dias
-capsid bot check --days 7 --limit 10
-
-# Sincronizar e transformar em receitas Capsid
-capsid bot sync --days 7 --limit 10 --recipes-dir recipes/
+capsid bot check --days 7 --limit 10                       # list candidates
+capsid bot sync --days 7 --limit 10 --recipes-dir recipes  # write recipes
 ```
 
----
+## Repository layout
 
-## 💡 How to Add a Tool
+```
+recipes/<tool>/<version>/recipe.yaml       recipe
+recipes/<tool>/<version>/pixi.lock         lockfile (pixi-conda)
+recipes/<tool>/<version>/requirements.lock lockfile (uv-pypi)
+stacks/<stack>.yaml                        stack, with <stack>.pixi.lock / <stack>.requirements.lock
+schema/                                    JSON Schema of the recipe and stack formats
+catalog.json, CATALOG.md, catalog.html     generated catalog
+.github/workflows/                         CI and publishing
+```
 
-See our [Contribution Guide](CONTRIBUTING.md) to add your favorite tool or version in under 2 minutes.
+## License
+
+Recipes and workflows in this repository are licensed under the [MIT License](LICENSE). Each packaged
+tool keeps its own license, recorded in its recipe and in the image labels.
