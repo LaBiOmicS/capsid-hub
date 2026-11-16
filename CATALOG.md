@@ -22,7 +22,7 @@
 ### Nextflow DSL2
 ```groovy
 process SAMTOOLS {
-    container 'ghcr.io/capsid/samtools:1.25'
+    container 'ghcr.io/labiomics/capsid/samtools:1.25'
     script:
     "samtools view -h in.bam > out.sam"
 }
@@ -31,11 +31,11 @@ process SAMTOOLS {
 ### Snakemake
 ```python
 rule bwa_mem:
-    container: 'docker://ghcr.io/capsid/bwa:0.7.19'
+    container: 'docker://ghcr.io/labiomics/capsid/bwa:0.7.19'
     shell: 'bwa mem {input} > {output}'
 ```
 
 ### Apptainer / HPC Direct
 ```bash
-apptainer exec oras://ghcr.io/capsid-sif/samtools:1.25 samtools --version
+apptainer exec docker://ghcr.io/labiomics/capsid/samtools:1.25 samtools --version
 ```

@@ -1,0 +1,6 @@
+{
+  "yaml.schemas": {
+    "./schema/recipe.schema.json": "recipes/*/*/recipe.yaml",
+    "./schema/stack.schema.json": "stacks/*.yaml"
+  }
+}

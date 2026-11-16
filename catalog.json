@@ -25,10 +25,10 @@
           "test_command": "bcftools -h",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/bcftools:1.21",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/bcftools:1.21",
-            "nextflow": "ghcr.io/capsid/bcftools:1.21",
-            "snakemake": "docker://ghcr.io/capsid/bcftools:1.21"
+            "docker": "docker://ghcr.io/labiomics/capsid/bcftools:1.21",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/bcftools:1.21",
+            "nextflow": "ghcr.io/labiomics/capsid/bcftools:1.21",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/bcftools:1.21"
           }
         },
         "1.25": {
@@ -42,10 +42,10 @@
           "test_command": "bcftools -h",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/bcftools:1.25",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/bcftools:1.25",
-            "nextflow": "ghcr.io/capsid/bcftools:1.25",
-            "snakemake": "docker://ghcr.io/capsid/bcftools:1.25"
+            "docker": "docker://ghcr.io/labiomics/capsid/bcftools:1.25",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/bcftools:1.25",
+            "nextflow": "ghcr.io/labiomics/capsid/bcftools:1.25",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/bcftools:1.25"
           }
         }
       }
@@ -72,10 +72,10 @@
           "test_command": "bedtools",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/bedtools:2.31.1",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/bedtools:2.31.1",
-            "nextflow": "ghcr.io/capsid/bedtools:2.31.1",
-            "snakemake": "docker://ghcr.io/capsid/bedtools:2.31.1"
+            "docker": "docker://ghcr.io/labiomics/capsid/bedtools:2.31.1",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/bedtools:2.31.1",
+            "nextflow": "ghcr.io/labiomics/capsid/bedtools:2.31.1",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/bedtools:2.31.1"
           }
         }
       }
@@ -102,10 +102,10 @@
           "test_command": "bwa 2>&1 | grep \"index sequences in the\"",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/bwa:0.7.19",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/bwa:0.7.19",
-            "nextflow": "ghcr.io/capsid/bwa:0.7.19",
-            "snakemake": "docker://ghcr.io/capsid/bwa:0.7.19"
+            "docker": "docker://ghcr.io/labiomics/capsid/bwa:0.7.19",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/bwa:0.7.19",
+            "nextflow": "ghcr.io/labiomics/capsid/bwa:0.7.19",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/bwa:0.7.19"
           }
         }
       }
@@ -133,10 +133,10 @@
           "test_command": "python -c 'import cutadapt; print(\"cutadapt OK\")'",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/cutadapt:5.2",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/cutadapt:5.2",
-            "nextflow": "ghcr.io/capsid/cutadapt:5.2",
-            "snakemake": "docker://ghcr.io/capsid/cutadapt:5.2"
+            "docker": "docker://ghcr.io/labiomics/capsid/cutadapt:5.2",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/cutadapt:5.2",
+            "nextflow": "ghcr.io/labiomics/capsid/cutadapt:5.2",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/cutadapt:5.2"
           }
         }
       }
@@ -163,10 +163,10 @@
           "test_command": "fastp --help",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/fastp:1.4.0",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/fastp:1.4.0",
-            "nextflow": "ghcr.io/capsid/fastp:1.4.0",
-            "snakemake": "docker://ghcr.io/capsid/fastp:1.4.0"
+            "docker": "docker://ghcr.io/labiomics/capsid/fastp:1.4.0",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/fastp:1.4.0",
+            "nextflow": "ghcr.io/labiomics/capsid/fastp:1.4.0",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/fastp:1.4.0"
           }
         }
       }
@@ -193,10 +193,10 @@
           "test_command": "minimap2 2>&1 | grep 'Usage'",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/minimap2:2.28",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/minimap2:2.28",
-            "nextflow": "ghcr.io/capsid/minimap2:2.28",
-            "snakemake": "docker://ghcr.io/capsid/minimap2:2.28"
+            "docker": "docker://ghcr.io/labiomics/capsid/minimap2:2.28",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/minimap2:2.28",
+            "nextflow": "ghcr.io/labiomics/capsid/minimap2:2.28",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/minimap2:2.28"
           }
         }
       }
@@ -224,10 +224,10 @@
           "test_command": "python -c 'import multiqc; print(\"multiqc OK\")'",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/multiqc:1.25.1",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/multiqc:1.25.1",
-            "nextflow": "ghcr.io/capsid/multiqc:1.25.1",
-            "snakemake": "docker://ghcr.io/capsid/multiqc:1.25.1"
+            "docker": "docker://ghcr.io/labiomics/capsid/multiqc:1.25.1",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/multiqc:1.25.1",
+            "nextflow": "ghcr.io/labiomics/capsid/multiqc:1.25.1",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/multiqc:1.25.1"
           }
         }
       }
@@ -253,10 +253,10 @@
           "test_command": "samtools --help",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/samtools:1.19",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/samtools:1.19",
-            "nextflow": "ghcr.io/capsid/samtools:1.19",
-            "snakemake": "docker://ghcr.io/capsid/samtools:1.19"
+            "docker": "docker://ghcr.io/labiomics/capsid/samtools:1.19",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/samtools:1.19",
+            "nextflow": "ghcr.io/labiomics/capsid/samtools:1.19",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/samtools:1.19"
           }
         },
         "1.25": {
@@ -270,10 +270,10 @@
           "test_command": "samtools --help",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/samtools:1.25",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/samtools:1.25",
-            "nextflow": "ghcr.io/capsid/samtools:1.25",
-            "snakemake": "docker://ghcr.io/capsid/samtools:1.25"
+            "docker": "docker://ghcr.io/labiomics/capsid/samtools:1.25",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/samtools:1.25",
+            "nextflow": "ghcr.io/labiomics/capsid/samtools:1.25",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/samtools:1.25"
           }
         }
       }
@@ -300,10 +300,10 @@
           "test_command": "seqkit version --help",
           "hpc_ready": true,
           "container_uris": {
-            "docker": "docker://ghcr.io/capsid/seqkit:2.8.2",
-            "singularity_oras": "oras://ghcr.io/capsid-sif/seqkit:2.8.2",
-            "nextflow": "ghcr.io/capsid/seqkit:2.8.2",
-            "snakemake": "docker://ghcr.io/capsid/seqkit:2.8.2"
+            "docker": "docker://ghcr.io/labiomics/capsid/seqkit:2.8.2",
+            "apptainer": "docker://ghcr.io/labiomics/capsid/seqkit:2.8.2",
+            "nextflow": "ghcr.io/labiomics/capsid/seqkit:2.8.2",
+            "snakemake": "docker://ghcr.io/labiomics/capsid/seqkit:2.8.2"
           }
         }
       }

@@ -1,74 +1,229 @@
 name: Capsid Hub Container Publisher
 
+# Publishes every changed recipe/stack as a multi-arch image (linux/amd64 + linux/arm64 when the
+# recipe supports it), signs it with Cosign (keyless, GitHub OIDC), attaches an SPDX SBOM and a
+# SLSA build-provenance attestation, then pulls the signed digest on a native arm64 runner and
+# runs the recipe test there.
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'recipes/**'
+      - 'stacks/**'
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "Space-separated recipe.yaml / stack .yaml paths, or 'all'"
+        required: true
+        default: 'all'
+
+env:
+  # Must match capsid/project.py REGISTRY
+  REGISTRY: ghcr.io/labiomics/capsid
+  # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
+  CAPSID_REF: c5bd61f2b0319fd5da12de97bce55a3c5619f704
 
 permissions:
-  contents: write
-  packages: write
-  pages: write
-  id-token: write
+  contents: read
 
 jobs:
-  publish:
+  detect:
     runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.targets.outputs.json }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
+      - name: Select targets
+        id: targets
+        env:
+          INPUT_TARGETS: ${{ github.event.inputs.targets }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ] && [ "$INPUT_TARGETS" = "all" ]; then
+            files=$(ls recipes/*/*/recipe.yaml stacks/*.yaml)
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            files=$(printf '%s\n' $INPUT_TARGETS)
+          else
+            # A change to a recipe dir (recipe.yaml or lockfiles) republishes that recipe;
+            # a change to stacks/<name>.* republishes that stack
+            changed=$(git diff --name-only HEAD~1 HEAD)
+            files=$( { echo "$changed" | grep -E '^recipes/[^/]+/[^/]+/' | cut -d/ -f1-3 | sort -u \
+                         | while read -r d; do [ -f "$d/recipe.yaml" ] && echo "$d/recipe.yaml"; done
+                       echo "$changed" | grep -E '^stacks/[^/]+$' | sed -E 's/\.(pixi|requirements)\.lock$/.yaml/' \
+                         | sort -u | while read -r f; do [ -f "$f" ] && echo "$f"; done
+                     } || true)
+          fi
+          # Only well-formed paths (they end up in image names and shell commands)
+          json=$(printf '%s\n' $files | grep -E '^(recipes/[a-z0-9._-]+/[A-Za-z0-9._+-]+/recipe\.yaml|stacks/[a-z0-9._-]+\.yaml)$' \
+                 | jq -R . | jq -cs .)
+          echo "json=$json" >> "$GITHUB_OUTPUT"
+          echo "Targets: $json"
+
+  publish:
+    needs: detect
+    if: needs.detect.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write       # Cosign keyless signing + attestations
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.detect.outputs.targets) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
 
       - name: Install Capsid CLI
-        run: |
-          uv tool install git+https://github.com/capsid/capsid.git
+        run: uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
 
-      - name: Set up QEMU (Multi-Architecture)
-        uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: sigstore/cosign-installer@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry (GHCR)
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Detect Newly Merged Recipes
-        id: merged-recipes
+      - name: Image name
+        id: name
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
-          # Any change in a recipe directory (recipe.yaml or its lockfiles) republishes that recipe
-          CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '^recipes/[^/]+/[^/]+/' | cut -d/ -f1-3 | sort -u \
-            | while read -r d; do [ -f "$d/recipe.yaml" ] && echo "$d/recipe.yaml"; done | tr '\n' ' ' || true)
-          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          if [[ "$TARGET" == stacks/* ]]; then
+            NAME=$(sed -nE "s/^name:[[:space:]]*['\"]?([^'\" ]+)['\"]?[[:space:]]*$/\1/p" "$TARGET")
+            VER=$(sed -nE "s/^version:[[:space:]]*['\"]?([^'\" ]+)['\"]?[[:space:]]*$/\1/p" "$TARGET")
+          else
+            NAME=$(basename "$(dirname "$(dirname "$TARGET")")"); VER=$(basename "$(dirname "$TARGET")")
+          fi
+          NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+          echo "image=${REGISTRY}/${NAME}" >> "$GITHUB_OUTPUT"
+          echo "tag=${REGISTRY}/${NAME}:${VER}" >> "$GITHUB_OUTPUT"
 
-      - name: Build and Push Multi-Arch Images
+      # Build -> test (host arch) -> rebuild all platforms and push (rewrite-timestamp)
+      - name: Build, test and push
+        env:
+          TARGET: ${{ matrix.target }}
+          TAG: ${{ steps.name.outputs.tag }}
+        run: capsid build "$TARGET" --tag "$TAG" --push
+
+      - name: Resolve pushed digest
+        id: digest
+        env:
+          TAG: ${{ steps.name.outputs.tag }}
         run: |
-          for file in ${{ steps.merged-recipes.outputs.files }}; do
-            TOOL=$(echo $(basename $(dirname $(dirname $file))) | tr '[:upper:]' '[:lower:]')
-            VER=$(basename $(dirname $file))
-            TAG="ghcr.io/${{ github.repository_owner }}/${TOOL}:${VER}"
-            echo "🚀 Building, validating, and pushing container for $file to $TAG..."
-            capsid build "$file" --tag "$TAG" --push
-          done
+          DIGEST=$(docker buildx imagetools inspect "$TAG" --format '{{json .Manifest.Digest}}' | jq -r .)
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          docker buildx imagetools inspect "$TAG"
 
-      - name: Rebuild Central Catalog
+      - name: Sign (Cosign keyless)
+        env:
+          REF: ${{ steps.name.outputs.image }}@${{ steps.digest.outputs.digest }}
+        run: cosign sign --yes --recursive "$REF"
+
+      - name: Generate SBOM (SPDX)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ steps.name.outputs.image }}@${{ steps.digest.outputs.digest }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+
+      - name: Attest SBOM
+        env:
+          REF: ${{ steps.name.outputs.image }}@${{ steps.digest.outputs.digest }}
+        run: cosign attest --yes --type spdxjson --predicate sbom.spdx.json "$REF"
+
+      - name: Attest build provenance (SLSA)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ steps.name.outputs.image }}
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
+
+  # Pull the signed image on a native arm64 runner and run the recipe test there
+  verify:
+    needs: [detect, publish]
+    if: needs.detect.outputs.targets != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.detect.outputs.targets) }}
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - uses: sigstore/cosign-installer@v3
+
+      - name: Install Capsid CLI
+        run: uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify signature and run the test on this architecture
+        env:
+          TARGET: ${{ matrix.target }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ "$TARGET" == stacks/* ]]; then
+            NAME=$(sed -nE "s/^name:[[:space:]]*['\"]?([^'\" ]+)['\"]?[[:space:]]*$/\1/p" "$TARGET")
+            VER=$(sed -nE "s/^version:[[:space:]]*['\"]?([^'\" ]+)['\"]?[[:space:]]*$/\1/p" "$TARGET")
+          else
+            NAME=$(basename "$(dirname "$(dirname "$TARGET")")"); VER=$(basename "$(dirname "$TARGET")")
+          fi
+          IMAGE="${REGISTRY}/$(echo "$NAME" | tr '[:upper:]' '[:lower:]')"
+          DIGEST=$(docker buildx imagetools inspect "$IMAGE:$VER" --format '{{json .Manifest.Digest}}' | jq -r .)
+          ARCH=$(docker version --format '{{.Server.Arch}}')
+          if ! docker buildx imagetools inspect "$IMAGE@$DIGEST" --raw | jq -e --arg a "$ARCH" \
+                 '[.manifests[]?.platform.architecture] | index($a)' >/dev/null; then
+            echo "::notice::$TARGET is not published for linux/$ARCH (recipe platforms); skipping"
+            exit 0
+          fi
+          cosign verify "$IMAGE@$DIGEST" \
+            --certificate-identity-regexp "^https://github.com/${REPO}/\.github/workflows/publish-release\.yaml@" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com > /dev/null
+          echo "✔ signature verified for $IMAGE@$DIGEST"
+          docker pull "$IMAGE@$DIGEST"
+          capsid test "$TARGET" --image "$IMAGE@$DIGEST"
+
+  catalog:
+    needs: [detect, publish, verify]
+    if: github.event_name == 'push' && needs.detect.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - name: Install Capsid CLI
+        run: uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
+      - name: Rebuild catalog and docs
         run: |
           capsid catalog --dir recipes --out catalog.json
-
-      - name: Commit Updated Catalog
+          capsid docs --dir recipes --catalog catalog.json --out-dir .
+      - name: Commit updated catalog
         run: |
           git config user.name "capsid-bot"
-          git config user.email "bot@capsid.io"
-          git add catalog.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(catalog): update central catalog [skip ci]" && git push)
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add catalog.json CATALOG.md catalog.html
+          git diff --staged --quiet || (git commit -m "chore(catalog): update central catalog [skip ci]" && git push)

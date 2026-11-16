@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "StackComponent": {
+      "properties": {
+        "recipe": {
+          "description": "Path or name of recipe to include",
+          "title": "Recipe",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Override version if using catalog name",
+          "title": "Version"
+        }
+      },
+      "required": [
+        "recipe"
+      ],
+      "title": "StackComponent",
+      "type": "object"
+    },
+    "TestConfig": {
+      "properties": {
+        "command": {
+          "description": "Command to execute inside container to verify functionality",
+          "title": "Command",
+          "type": "string"
+        },
+        "expected_checksum": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Expected SHA-256 checksum of generated output file",
+          "title": "Expected Checksum"
+        },
+        "expected_exit_code": {
+          "default": 0,
+          "description": "Expected process exit code",
+          "title": "Expected Exit Code",
+          "type": "integer"
+        },
+        "expected_output": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Substring expected in stdout/stderr",
+          "title": "Expected Output"
+        },
+        "files": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Test input files (filename -> inline content)",
+          "title": "Files",
+          "type": "object"
+        },
+        "output_file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Output file path to verify checksum",
+          "title": "Output File"
+        },
+        "random_seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fixed random seed for deterministic execution",
+          "title": "Random Seed"
+        }
+      },
+      "required": [
+        "command"
+      ],
+      "title": "TestConfig",
+      "type": "object"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/LaBiOmicS/capsid-hub/main/schema/stack.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "apt_snapshot": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "snapshot.debian.org timestamp or 'latest'",
+      "pattern": "^(\\d{8}T\\d{6}Z|latest)$",
+      "title": "Apt Snapshot"
+    },
+    "components": {
+      "description": "List of recipes included in this stack",
+      "items": {
+        "$ref": "#/$defs/StackComponent"
+      },
+      "title": "Components",
+      "type": "array"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Description of the combined container",
+      "title": "Description"
+    },
+    "name": {
+      "description": "Stack container name, e.g. 'rnaseq-toolkit'",
+      "title": "Name",
+      "type": "string"
+    },
+    "test": {
+      "$ref": "#/$defs/TestConfig",
+      "description": "Test command verifying all tools work"
+    },
+    "version": {
+      "description": "Stack release version, e.g. '1.0.0'",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "components",
+    "test"
+  ],
+  "title": "Capsid stack (stacks/<name>.yaml)",
+  "type": "object"
+}

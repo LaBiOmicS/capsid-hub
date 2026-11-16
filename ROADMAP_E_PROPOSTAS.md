@@ -67,7 +67,7 @@ Ao retomar os trabalhos, os próximos passos planejados são:
 * **Objetivo:** Ao dar o push dos repositórios no GitHub, ativar a compilação nativa para:
   - `linux/amd64` (Servidores tradicionais e HPC x86)
   - `linux/arm64` (Apple Silicon M1/M2/M3/M4 e nuvem AWS Graviton)
-* **Destino:** Publicar automaticamente no GitHub Container Registry (`ghcr.io/capsid/<tool>:<version>`).
+* **Destino:** Publicar automaticamente no GitHub Container Registry (`ghcr.io/labiomics/capsid/<tool>:<version>`).
 
 ### Proposta C: Proveniência e Assinatura Criptográfica (SLSA & Cosign)
 * **Objetivo:** Garantir integridade máxima para uso em hospitais, ensaios clínicos e empresas de biotecnologia.

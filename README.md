@@ -4,7 +4,7 @@
 > Ultra-slim, hardened, multi-arch bioinformatics containers ready for HPC, Nextflow, Snakemake, and Kubernetes.
 
 [![Audit Workflow](https://img.shields.io/badge/ci-Capsid%20Bot%20Auditor-success.svg)](.github/workflows/pr-audit.yaml)
-[![Registry](https://img.shields.io/badge/registry-ghcr.io%2Fcapsid-blue.svg)](https://github.com/orgs/capsid/packages)
+[![Registry](https://img.shields.io/badge/registry-ghcr.io%2Flabiomics%2Fcapsid-blue.svg)](https://github.com/orgs/LaBiOmicS/packages)
 [![Hardened](https://img.shields.io/badge/security-rootless%20%7C%20tini-green.svg)](CONTRIBUTING.md)
 
 ---
@@ -16,7 +16,8 @@ Capsid Hub is the open-source repository where scientific container recipes live
 1. **Lightweight & Fast**: Individual path-based builds that finish in seconds, avoiding giant monorepo CI queues.
 2. **Automated Security & Duplicate Gate**: Every Pull Request is verified automatically by **Capsid Bot** before merge.
 3. **Hardened Standards**: Every container runs as unprivileged user `bio:1000` with **Tini** PID 1 init.
-4. **Instant OCI Distribution**: Published to `ghcr.io/capsid/<tool>:<version>`.
+4. **Instant OCI Distribution**: Published to `ghcr.io/labiomics/capsid/<tool>:<version>` (stacks: `ghcr.io/labiomics/capsid/<stack>:<version>`) for `linux/amd64` and, when the recipe supports it, `linux/arm64`.
+5. **Signed & Attested**: every image is signed with Sigstore Cosign (keyless, GitHub OIDC) and carries an SPDX SBOM and SLSA build-provenance attestation. Each published digest is pulled back and tested on native amd64 and arm64 runners.
 
 ---
 
@@ -25,16 +26,16 @@ Capsid Hub is the open-source repository where scientific container recipes live
 ### With Docker / Podman:
 
 ```bash
-docker run --rm ghcr.io/capsid/samtools:1.25 samtools --help
-docker run --rm ghcr.io/capsid/cutadapt:5.2 cutadapt --version
-docker run --rm ghcr.io/capsid/bwa:0.7.19 bwa
+docker run --rm ghcr.io/labiomics/capsid/samtools:1.25 samtools --help
+docker run --rm ghcr.io/labiomics/capsid/cutadapt:5.2 cutadapt --version
+docker run --rm ghcr.io/labiomics/capsid/bwa:0.7.19 bwa
 ```
 
 ### With Nextflow:
 
 ```groovy
 process ALIGN {
-    container 'ghcr.io/capsid/bwa:0.7.19'
+    container 'ghcr.io/labiomics/capsid/bwa:0.7.19'
 
     input:
     path genome
@@ -53,8 +54,37 @@ process ALIGN {
 ### With Apptainer / Singularity:
 
 ```bash
-apptainer exec docker://ghcr.io/capsid/bwa:0.7.19 bwa
+apptainer exec docker://ghcr.io/labiomics/capsid/bwa:0.7.19 bwa
 ```
+
+---
+
+## 🔏 Verifying an Image
+
+```bash
+IMAGE=ghcr.io/labiomics/capsid/samtools:1.25
+
+# Cosign signature (keyless, issued to this repository's publish workflow)
+cosign verify "$IMAGE" \
+  --certificate-identity-regexp '^https://github.com/LaBiOmicS/capsid-hub/\.github/workflows/publish-release\.yaml@' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+
+# SPDX SBOM attestation
+cosign verify-attestation --type spdxjson "$IMAGE" \
+  --certificate-identity-regexp '^https://github.com/LaBiOmicS/capsid-hub/' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+
+# SLSA build provenance
+gh attestation verify "oci://$IMAGE" --repo LaBiOmicS/capsid-hub
+```
+
+---
+
+## 📐 Recipe Schema
+
+`schema/recipe.schema.json` and `schema/stack.schema.json` (generated with `capsid schema`) describe the
+YAML format. VS Code picks them up from `.vscode/settings.json`; other editors can use
+`# yaml-language-server: $schema=https://raw.githubusercontent.com/LaBiOmicS/capsid-hub/main/schema/recipe.schema.json`.
 
 ---
 

@@ -1,92 +1,114 @@
 name: Convert Web Issue to Pull Request
 
+# Issue content is untrusted. The recipe is extracted and built WITHOUT write permissions;
+# only the final job (which never executes recipe content) gets a write token to open the PR.
+
 on:
   issues:
     types: [opened]
 
+env:
+  # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
+  CAPSID_REF: c5bd61f2b0319fd5da12de97bce55a3c5619f704
+
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
+  contents: read
 
 jobs:
-  process-issue:
+  extract:
     if: contains(github.event.issue.labels.*.name, 'new-recipe')
     runs-on: ubuntu-latest
+    outputs:
+      tool: ${{ steps.extract.outputs.tool }}
+      version: ${{ steps.extract.outputs.version }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up uv & Capsid
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-
-      - name: Install Capsid CLI
-        run: |
-          uv tool install git+https://github.com/capsid/capsid.git
-
-      - name: Extract Recipe from Issue
+      - name: Extract recipe from issue
         id: extract
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const path = require('path');
-            const body = context.payload.issue.body;
-            
-            // Extract YAML code block
+            const body = context.payload.issue.body || "";
             const match = body.match(/```(?:yaml)?\s*([\s\S]*?)```/);
-            if (!match) {
-              core.setFailed("No valid YAML block found in issue body.");
-              return;
+            if (!match) { core.setFailed("No YAML block found in issue body."); return; }
+            const yamlContent = match[1].trim() + "\n";
+            const name = yamlContent.match(/^name:\s*['"]?([^'"\s]+)['"]?\s*$/m);
+            const ver = yamlContent.match(/^version:\s*['"]?([^'"\s]+)['"]?\s*$/m);
+            // Strict allow-lists: these values become paths, branch names and image tags
+            if (!name || !/^[a-z0-9][a-z0-9._-]{0,63}$/.test(name[1].toLowerCase())) {
+              core.setFailed("Tool name must match ^[a-z0-9][a-z0-9._-]*$"); return;
             }
-            const yamlContent = match[1].trim();
-            
-            // Extract name and version with regex
-            const nameMatch = yamlContent.match(/^name:\s*['"]?([a-zA-Z0-9_-]+)['"]?/m);
-            const verMatch = yamlContent.match(/^version:\s*['"]?([^'"\s]+)['"]?/m);
-            
-            if (!nameMatch || !verMatch) {
-              core.setFailed("Could not extract tool name or version from recipe YAML.");
-              return;
+            if (!ver || !/^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$/.test(ver[1])) {
+              core.setFailed("Version must match ^[A-Za-z0-9][A-Za-z0-9._+-]*$"); return;
             }
-            
-            const tool = nameMatch[1].toLowerCase();
-            const ver = verMatch[1];
-            
-            const targetDir = path.join('recipes', tool, ver);
-            fs.mkdirSync(targetDir, { recursive: true });
-            const filePath = path.join(targetDir, 'recipe.yaml');
-            fs.writeFileSync(filePath, yamlContent);
-            
-            core.setOutput('tool', tool);
-            core.setOutput('version', ver);
-            core.setOutput('file_path', filePath);
+            fs.mkdirSync('submission', { recursive: true });
+            fs.writeFileSync('submission/recipe.yaml', yamlContent);
+            core.setOutput('tool', name[1].toLowerCase());
+            core.setOutput('version', ver[1]);
 
-      - name: Security & Integrity Audit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: submission
+          path: submission/recipe.yaml
+
+  build:
+    needs: extract
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: submission
+          path: submission
+
+      - uses: astral-sh/setup-uv@v3
+      - name: Install Capsid CLI
+        run: uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
+
+      - name: Security & integrity audit
+        run: capsid lint submission/recipe.yaml --catalog catalog.json
+
+      - uses: docker/setup-buildx-action@v3
+      - name: Build & test the container
+        run: capsid build submission/recipe.yaml --test
+
+  open-pr:
+    needs: [extract, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: submission
+          path: submission
+
+      - name: Place recipe
+        env:
+          TOOL: ${{ needs.extract.outputs.tool }}
+          VERSION: ${{ needs.extract.outputs.version }}
         run: |
-          capsid lint "${{ steps.extract.outputs.file_path }}" --catalog catalog.json
+          mkdir -p "recipes/$TOOL/$VERSION"
+          mv submission/recipe.yaml "recipes/$TOOL/$VERSION/recipe.yaml"
+          rm -rf submission
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Test Container Compilation
-        run: |
-          capsid build "${{ steps.extract.outputs.file_path }}" --test
-
-      - name: Create Pull Request from Issue
+      - name: Create pull request
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "feat(recipe): add ${{ steps.extract.outputs.tool }} ${{ steps.extract.outputs.version }} from issue #${{ github.event.issue.number }}"
+          commit-message: "feat(recipe): add ${{ needs.extract.outputs.tool }} ${{ needs.extract.outputs.version }} from issue #${{ github.event.issue.number }}"
           branch: "issue-${{ github.event.issue.number }}"
-          title: "feat(recipe): add ${{ steps.extract.outputs.tool }} ${{ steps.extract.outputs.version }}"
+          title: "feat(recipe): add ${{ needs.extract.outputs.tool }} ${{ needs.extract.outputs.version }}"
           body: |
             Closes #${{ github.event.issue.number }}
-            
-            Submitted by @${{ github.event.issue.user.login }} via Web Form.
-            - **Tool:** `${{ steps.extract.outputs.tool }}`
-            - **Version:** `${{ steps.extract.outputs.version }}`
-            - **Audit:** Passed
-            - **Build & Test:** Passed
+
+            Submitted by @${{ github.event.issue.user.login }} via the web form.
+            - **Tool:** `${{ needs.extract.outputs.tool }}`
+            - **Version:** `${{ needs.extract.outputs.version }}`
+            - **Audit / build / test:** passed in an unprivileged job
+
+            Lockfiles are not generated from issues: run `capsid lock` before merging.

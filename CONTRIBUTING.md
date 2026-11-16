@@ -19,7 +19,7 @@ Fork repo ──> Scaffold recipe ──> Test & Lint locally ──> Open PR �
 Ensure you have the latest Capsid CLI installed via [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv tool install git+https://github.com/capsid/capsid.git
+uv tool install git+https://github.com/LaBiOmicS/capsid.git
 ```
 
 ---

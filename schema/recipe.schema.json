@@ -1,0 +1,471 @@
+{
+  "$defs": {
+    "BuildConfig": {
+      "properties": {
+        "apt_snapshot": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "snapshot.debian.org timestamp (YYYYMMDDTHHMMSSZ) for apt packages; 'latest' disables the snapshot. Defaults to Capsid's pinned snapshot when base_image is not overridden",
+          "pattern": "^(\\d{8}T\\d{6}Z|latest)$",
+          "title": "Apt Snapshot"
+        },
+        "base_image": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Runtime (and source/uv builder) base image, ideally pinned by @sha256 digest",
+          "title": "Base Image"
+        },
+        "binary_url_amd64": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Precompiled binary URL for x86_64",
+          "title": "Binary Url Amd64"
+        },
+        "binary_url_arm64": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Precompiled binary URL for aarch64",
+          "title": "Binary Url Arm64"
+        },
+        "build_commands": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Custom shell build commands",
+          "title": "Build Commands"
+        },
+        "channels": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Channels"
+        },
+        "cmake_args": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Extra arguments for cmake",
+          "title": "Cmake Args"
+        },
+        "conda_packages": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Conda packages for Pixi",
+          "title": "Conda Packages"
+        },
+        "configure_args": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Extra arguments for ./configure",
+          "title": "Configure Args"
+        },
+        "dependencies": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": "System apt/apk package dependencies separated by build-time and runtime",
+          "title": "Dependencies",
+          "type": "object"
+        },
+        "env": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Environment variables to set in container",
+          "title": "Env",
+          "type": "object"
+        },
+        "install_prefix": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Destination prefix (default: /opt/<name>)",
+          "title": "Install Prefix"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "PyPI package specifier, e.g. 'cutadapt==4.9'",
+          "title": "Package"
+        },
+        "python_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "3.12",
+          "description": "Python version to use",
+          "title": "Python Version"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SHA256 checksum of source archive",
+          "pattern": "^\\s*[0-9a-fA-F]{64}\\s*$",
+          "title": "Sha256"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Source archive or repository URL",
+          "title": "Source"
+        },
+        "source_date_epoch": {
+          "default": 1700000000,
+          "description": "SOURCE_DATE_EPOCH passed to BuildKit for deterministic image timestamps",
+          "title": "Source Date Epoch",
+          "type": "integer"
+        },
+        "type": {
+          "$ref": "#/$defs/BuildType",
+          "description": "Build engine and strategy"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "BuildConfig",
+      "type": "object"
+    },
+    "BuildType": {
+      "enum": [
+        "uv-pypi",
+        "pixi-conda",
+        "autotools",
+        "cmake",
+        "make",
+        "binary",
+        "rust-cargo",
+        "stack"
+      ],
+      "title": "BuildType",
+      "type": "string"
+    },
+    "Platform": {
+      "enum": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "title": "Platform",
+      "type": "string"
+    },
+    "TestConfig": {
+      "properties": {
+        "command": {
+          "description": "Command to execute inside container to verify functionality",
+          "title": "Command",
+          "type": "string"
+        },
+        "expected_checksum": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Expected SHA-256 checksum of generated output file",
+          "title": "Expected Checksum"
+        },
+        "expected_exit_code": {
+          "default": 0,
+          "description": "Expected process exit code",
+          "title": "Expected Exit Code",
+          "type": "integer"
+        },
+        "expected_output": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Substring expected in stdout/stderr",
+          "title": "Expected Output"
+        },
+        "files": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Test input files (filename -> inline content)",
+          "title": "Files",
+          "type": "object"
+        },
+        "output_file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Output file path to verify checksum",
+          "title": "Output File"
+        },
+        "random_seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fixed random seed for deterministic execution",
+          "title": "Random Seed"
+        }
+      },
+      "required": [
+        "command"
+      ],
+      "title": "TestConfig",
+      "type": "object"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/LaBiOmicS/capsid-hub/main/schema/recipe.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "build": {
+      "$ref": "#/$defs/BuildConfig"
+    },
+    "categories": {
+      "description": "Topic/category tags (e.g. genomics, transcriptomics)",
+      "items": {
+        "type": "string"
+      },
+      "title": "Categories",
+      "type": "array"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "One-line summary of tool function",
+      "title": "Description"
+    },
+    "doi": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Persistent Digital Object Identifier (DOI) for tool or paper",
+      "title": "Doi"
+    },
+    "edam_operations": {
+      "description": "EDAM ontology operation IDs, e.g. ['operation_0573']",
+      "items": {
+        "type": "string"
+      },
+      "title": "Edam Operations",
+      "type": "array"
+    },
+    "edam_topics": {
+      "description": "EDAM ontology topic IDs, e.g. ['topic_0080']",
+      "items": {
+        "type": "string"
+      },
+      "title": "Edam Topics",
+      "type": "array"
+    },
+    "homepage": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Official project homepage or repository",
+      "title": "Homepage"
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Custom OCI labels",
+      "title": "Labels",
+      "type": "object"
+    },
+    "license": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "SPDX license identifier, e.g. 'MIT', 'GPL-3.0-or-later'",
+      "title": "License"
+    },
+    "name": {
+      "description": "Canonical tool name, lowercase, e.g. 'samtools'",
+      "title": "Name",
+      "type": "string"
+    },
+    "platforms": {
+      "description": "Target architectures",
+      "items": {
+        "$ref": "#/$defs/Platform"
+      },
+      "title": "Platforms",
+      "type": "array"
+    },
+    "ro_crate": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Custom RO-Crate metadata overlay",
+      "title": "Ro Crate"
+    },
+    "test": {
+      "$ref": "#/$defs/TestConfig"
+    },
+    "version": {
+      "description": "Tool version, e.g. '1.21'",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "build",
+    "test"
+  ],
+  "title": "Capsid recipe (recipes/<tool>/<version>/recipe.yaml)",
+  "type": "object"
+}

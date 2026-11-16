@@ -20,6 +20,10 @@ on:
         required: false
         default: false
 
+env:
+  # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
+  CAPSID_REF: c5bd61f2b0319fd5da12de97bce55a3c5619f704
+
 permissions:
   contents: write
   pull-requests: write
@@ -41,14 +45,16 @@ jobs:
 
       - name: ⚙️ Install Capsid CLI Engine
         run: |
-          uv tool install git+https://github.com/capsid/capsid.git || pip install git+https://github.com/capsid/capsid.git
+          uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
 
       - name: 🤖 Run Capsid Robot Harvester
         id: run_bot
+        env:
+          DAYS: ${{ github.event.inputs.days || '7' }}
+          LIMIT: ${{ github.event.inputs.limit || '10' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
         run: |
-          DAYS="${{ github.event.inputs.days || '7' }}"
-          LIMIT="${{ github.event.inputs.limit || '10' }}"
-          DRY_RUN="${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}"
+          [[ "$DAYS" =~ ^[0-9]+$ && "$LIMIT" =~ ^[0-9]+$ ]] || { echo "::error::days/limit must be integers"; exit 1; }
 
           echo "Running Capsid Robot with lookback $DAYS days and limit $LIMIT tools..."
           capsid bot sync \
