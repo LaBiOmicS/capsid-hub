@@ -1,0 +1,56 @@
+name: Hub website
+
+# Builds the hub website (https://labiomics.github.io/capsid-hub/) with `capsid site` and deploys it to
+# GitHub Pages. Called by publish-release after every publication (so new images and their digests
+# appear); also runs when this workflow changes and on demand. Nothing is committed: the site
+# is a build artefact.
+
+on:
+  workflow_call:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pages.yaml'
+  workflow_dispatch:
+
+env:
+  # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
+  CAPSID_REF: a98615e8d85e89e446dc39e48029e8a002079ab5
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@caf0cab7a618c569241d31dcd442f54681755d39 # v3.2.4
+      - name: Install Capsid CLI
+        run: uv tool install "git+https://github.com/LaBiOmicS/capsid.git@${CAPSID_REF}"
+      - name: Build site
+        run: capsid site --hub . --out _site --resolve-digests
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

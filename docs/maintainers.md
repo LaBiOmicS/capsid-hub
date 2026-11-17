@@ -32,10 +32,10 @@ outside `recipes/` and `stacks/`, especially `.github/`.
 
 ## Updating the Capsid engine
 
-All four workflows (`pr-audit`, `issue-submission`, `publish-release`, `friday-robot-sync`) install
+All five workflows (`pr-audit`, `issue-submission`, `publish-release`, `friday-robot-sync`, `pages`) install
 Capsid from the commit in `env.CAPSID_REF`. To move to a new engine version:
 
-1. Update `CAPSID_REF` to the full commit SHA in **all four** workflows in one pull request.
+1. Update `CAPSID_REF` to the full commit SHA in **all five** workflows in one pull request.
 2. In the same pull request, regenerate the files that depend on the engine:
    ```bash
    uv tool install --force "git+https://github.com/LaBiOmicS/capsid.git@<sha>"
@@ -76,10 +76,22 @@ lockfile before merging.
 
 ## Regenerating the catalog
 
-`catalog.json`, `CATALOG.md` and `catalog.html` are generated. The `publish-release` workflow
-regenerates and commits them after every publication, so contributors do not need to. To regenerate
-them by hand (for example after an engine update):
+`catalog.json` and `CATALOG.md` are generated. The `publish-release` workflow regenerates and
+commits them after every publication, so contributors do not need to. To regenerate them by hand
+(for example after an engine update):
 
 ```bash
 capsid catalog && capsid docs
+```
+
+## Website
+
+The website at <https://labiomics.github.io/capsid-hub/> is built by the `pages` workflow with
+`capsid site` after every publication (called by `publish-release`) and on demand
+(`gh workflow run pages.yaml`). It is not committed. The repository's Pages source must be set to
+**GitHub Actions** (Settings → Pages). To preview locally:
+
+```bash
+capsid site --hub . --out _site --resolve-digests
+python3 -m http.server -d _site 8000
 ```

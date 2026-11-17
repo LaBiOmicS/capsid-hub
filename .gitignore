@@ -4,6 +4,7 @@ __pycache__/
 
 # Build outputs
 .capsid-build/
+_site/
 *.sif
 *.tar.gz
 build/

@@ -11,8 +11,11 @@ This repository holds the recipes (`recipes/<tool>/<version>/`), multi-tool stac
 lockfiles, and the pipeline that builds, tests, signs and publishes every image to
 `ghcr.io/labiomics/capsid`.
 
-- **Browse the tools:** [CATALOG.md](CATALOG.md), or the searchable `catalog.html`; machine-readable
-  index in [catalog.json](catalog.json).
+- **Browse the tools:** the [hub website](https://labiomics.github.io/capsid-hub/) has a searchable
+  catalogue and one page per image (digest, locked closure, usage, verification); also
+  [CATALOG.md](CATALOG.md) and the machine-readable [catalog.json](catalog.json).
+- **Guides:** [using the images](https://labiomics.github.io/capsid-hub/guide/using/index.html) and
+  [submitting a tool](https://labiomics.github.io/capsid-hub/guide/contributing/index.html).
 - **Add a tool or version:** [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Report a security issue:** [SECURITY.md](SECURITY.md).
 
@@ -129,7 +132,7 @@ recipes/<tool>/<version>/pixi.lock         lockfile (pixi-conda)
 recipes/<tool>/<version>/requirements.lock lockfile (uv-pypi)
 stacks/<stack>.yaml                        stack, with <stack>.pixi.lock / <stack>.requirements.lock
 schema/                                    JSON Schema of the recipe and stack formats
-catalog.json, CATALOG.md, catalog.html     generated catalog
+catalog.json, CATALOG.md                   generated catalog (the website is built by CI, not committed)
 .github/workflows/                         CI and publishing
 ```
 
