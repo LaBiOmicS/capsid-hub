@@ -2,6 +2,7 @@
 
 **Community recipes and published images for [Capsid](https://github.com/LaBiOmicS/capsid):
 reproducible, hardened, signed multi-architecture containers for bioinformatics tools.**
+Developed at LaBiOmicS, Universidade de Mogi das Cruzes (UMC), Brazil.
 
 [![PR audit](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/pr-audit.yaml/badge.svg)](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/pr-audit.yaml)
 [![Publish](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/publish-release.yaml/badge.svg)](https://github.com/LaBiOmicS/capsid-hub/actions/workflows/publish-release.yaml)
@@ -135,6 +136,11 @@ schema/                                    JSON Schema of the recipe and stack f
 catalog.json, CATALOG.md                   generated catalog (the website is built by CI, not committed)
 .github/workflows/                         CI and publishing
 ```
+
+## Origin
+
+Capsid and Capsid Hub are developed at [LaBiOmicS](https://github.com/LaBiOmicS), Universidade de Mogi das
+Cruzes (UMC), Brazil.
 
 ## License
 

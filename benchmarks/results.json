@@ -1,0 +1,993 @@
+{
+  "measured_at": "2026-11-17T21:10:58Z",
+  "platform": "linux/amd64",
+  "scanner": {
+    "image": "aquasec/trivy:0.75.0",
+    "version": {
+      "Version": "0.75.0",
+      "VulnerabilityDB": {
+        "Version": 2,
+        "NextUpdate": "2026-11-18T19:04:24.303580799Z",
+        "UpdatedAt": "2026-11-17T19:04:24.303581049Z",
+        "DownloadedAt": "2026-11-17T20:55:00.609902331Z"
+      }
+    }
+  },
+  "sources": {
+    "capsid": "Capsid",
+    "biocontainers": "BioContainers",
+    "staphb": "StaPH-B"
+  },
+  "results": [
+    {
+      "tool": "samtools",
+      "version": "1.25",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/samtools:1.25",
+          "digest": "sha256:ca3df38375ca837bfe2ac120517301d2ba0c20ae6392b28bf7e1cef0c3e63391",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 77816587,
+          "uncompressed_bytes": 305873981,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 117,
+          "packages_by_type": {
+            "conda-pkg": 25,
+            "debian": 92
+          },
+          "vulnerabilities": {
+            "CRITICAL": 1,
+            "HIGH": 37,
+            "MEDIUM": 108,
+            "LOW": 87,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/samtools:1.25--h9dcdb79_0",
+          "digest": "sha256:d9652375d1cccafca56738b2c7c4fe6c5234dd798af3c3874f96f5f49f92c8a1",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 50794215,
+          "uncompressed_bytes": 192217559,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 0,
+          "packages_by_type": {},
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {}
+        }
+      }
+    },
+    {
+      "tool": "bwa",
+      "version": "0.7.19",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/bwa:0.7.19",
+          "digest": "sha256:e6e21a9bb0755e8ba222191d24dd92abc8bf0a7a5b477cece84af1b234d2c094",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 51187637,
+          "uncompressed_bytes": 220451047,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 99,
+          "packages_by_type": {
+            "conda-pkg": 7,
+            "debian": 92
+          },
+          "vulnerabilities": {
+            "CRITICAL": 1,
+            "HIGH": 37,
+            "MEDIUM": 108,
+            "LOW": 87,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/bwa:0.7.19--h577a1d6_1",
+          "digest": "sha256:99a35e5ee4e9c329e8746c4689890b97a3ac5620cb36d374cba69ba52016e72a",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 26730774,
+          "uncompressed_bytes": 125432838,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 0,
+          "packages_by_type": {},
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {}
+        },
+        "staphb": {
+          "ref": "staphb/bwa:0.7.19",
+          "digest": "sha256:e4f2bd6ba48ad1923f2edec641a59f2ba0f26b59805fb9812d780996ba5fa8df",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 30282931,
+          "uncompressed_bytes": 119363599,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "ubuntu 22.04",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 101,
+          "packages_by_type": {
+            "ubuntu": 101
+          },
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 5,
+            "MEDIUM": 180,
+            "LOW": 66,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 5,
+            "MEDIUM": 160,
+            "LOW": 49,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "ubuntu": 251
+          }
+        }
+      }
+    },
+    {
+      "tool": "fastp",
+      "version": "1.4.0",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/fastp:1.4.0",
+          "digest": "sha256:72b47726d2946ab818a813aa0039af8a8f7fe2472f7949cb3e6bb6750f62fbbf",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 50555676,
+          "uncompressed_bytes": 200612940,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 100,
+          "packages_by_type": {
+            "conda-pkg": 8,
+            "debian": 92
+          },
+          "vulnerabilities": {
+            "CRITICAL": 1,
+            "HIGH": 37,
+            "MEDIUM": 108,
+            "LOW": 87,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/fastp:1.4.0--h43da1c4_0",
+          "digest": "sha256:7dcc9e128315636a3c471a82617ca7a103e823cc22d65beb28794d06c1920e1d",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 22927836,
+          "uncompressed_bytes": 88026316,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 0,
+          "packages_by_type": {},
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {}
+        },
+        "staphb": {
+          "ref": "staphb/fastp:1.4.0",
+          "digest": "sha256:359dfc545a689c8d78d71b992c81425c65fcd7236088a058fc0372c86da11be6",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 6,
+          "compressed_bytes": 49346714,
+          "uncompressed_bytes": 199142960,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "ubuntu 24.04",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 114,
+          "packages_by_type": {
+            "ubuntu": 114
+          },
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 2,
+            "MEDIUM": 55,
+            "LOW": 7,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 2,
+            "MEDIUM": 20,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "ubuntu": 64
+          }
+        }
+      }
+    },
+    {
+      "tool": "multiqc",
+      "version": "1.25.1",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/multiqc:1.25.1",
+          "digest": "sha256:60ff9056723700402cf1cb915475a3821c652253c7b1736beb9a97acf0f96db9",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 18,
+          "compressed_bytes": 109767728,
+          "uncompressed_bytes": 506704026,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 160,
+          "packages_by_type": {
+            "debian": 106,
+            "node-pkg": 1,
+            "python-pkg": 53
+          },
+          "vulnerabilities": {
+            "CRITICAL": 2,
+            "HIGH": 99,
+            "MEDIUM": 147,
+            "LOW": 109,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 5,
+            "LOW": 1,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 362,
+            "python-pkg": 6
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/multiqc:1.25.1--pyhdfd78af_0",
+          "digest": "sha256:64fa8caa046020780a7df765cdd27b459f20665578e6f1f240a12d415527adaa",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 4,
+          "compressed_bytes": 302042416,
+          "uncompressed_bytes": 1494749383,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 199,
+          "packages_by_type": {
+            "debian": 134,
+            "node-pkg": 1,
+            "python-pkg": 64
+          },
+          "vulnerabilities": {
+            "CRITICAL": 24,
+            "HIGH": 210,
+            "MEDIUM": 284,
+            "LOW": 185,
+            "UNKNOWN": 15
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 22,
+            "HIGH": 104,
+            "MEDIUM": 140,
+            "LOW": 44,
+            "UNKNOWN": 5
+          },
+          "vulnerabilities_by_type": {
+            "debian": 631,
+            "python-pkg": 87
+          }
+        }
+      }
+    },
+    {
+      "tool": "minimap2",
+      "version": "2.28",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/minimap2:2.28",
+          "digest": "sha256:4805022b1f964d2ac7e469754e7c00b75ad24a503ed218c2eb456cade1210a58",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 133374201,
+          "uncompressed_bytes": 567517740,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 102,
+          "packages_by_type": {
+            "conda-pkg": 10,
+            "debian": 92
+          },
+          "vulnerabilities": {
+            "CRITICAL": 1,
+            "HIGH": 37,
+            "MEDIUM": 108,
+            "LOW": 87,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/minimap2:2.28--h577a1d6_4",
+          "digest": "sha256:8310d4996f929c1dbde6d2b17b755d211d6e4493ce6cc3d514842cf8df27af80",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 67099691,
+          "uncompressed_bytes": 282628061,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 0,
+          "packages_by_type": {},
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {}
+        },
+        "staphb": {
+          "ref": "staphb/minimap2:2.28",
+          "digest": "sha256:8d3a5c1b954da24a6d47b1197e876deb9047a0936a57e3e72649ab1b4edd74a4",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 4,
+          "compressed_bytes": 34566715,
+          "uncompressed_bytes": 136242776,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "ubuntu 22.04",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 114,
+          "packages_by_type": {
+            "ubuntu": 114
+          },
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 8,
+            "MEDIUM": 282,
+            "LOW": 164,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 8,
+            "MEDIUM": 260,
+            "LOW": 147,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "ubuntu": 454
+          }
+        }
+      }
+    },
+    {
+      "tool": "bcftools",
+      "version": "1.21",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/bcftools:1.21",
+          "digest": "sha256:8dd5aedb7a2b2729f2cd339cd64ffde82b9cb3bb058ad9a67889b7a46833f37c",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 114704913,
+          "uncompressed_bytes": 479683395,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 127,
+          "packages_by_type": {
+            "conda-pkg": 35,
+            "debian": 92
+          },
+          "vulnerabilities": {
+            "CRITICAL": 1,
+            "HIGH": 37,
+            "MEDIUM": 108,
+            "LOW": 87,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/bcftools:1.21--h3a4d415_1",
+          "digest": "sha256:e32f39e2c692c4a6ec8ba4a48b1f9b5b6c01616aba46affdaca0b943014e794e",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 64294633,
+          "uncompressed_bytes": 287941275,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 0,
+          "packages_by_type": {},
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {}
+        },
+        "staphb": {
+          "ref": "staphb/bcftools:1.21",
+          "digest": "sha256:c256fe5b7f8a216c517c2c6ff8fd68a6643ee614e93eedd181aa2c53600ec209",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 5,
+          "compressed_bytes": 49888874,
+          "uncompressed_bytes": 210670408,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "ubuntu 22.04",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 120,
+          "packages_by_type": {
+            "ubuntu": 120
+          },
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 6,
+            "MEDIUM": 267,
+            "LOW": 104,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 6,
+            "MEDIUM": 236,
+            "LOW": 87,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "ubuntu": 377
+          }
+        }
+      }
+    },
+    {
+      "tool": "seqkit",
+      "version": "2.8.2",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/seqkit:2.8.2",
+          "digest": "sha256:7c7493728272d53d60378041b0b69ecd3db95c7c661b0208adb54a9adcd8e98b",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 41026098,
+          "uncompressed_bytes": 155505503,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 144,
+          "packages_by_type": {
+            "conda-pkg": 1,
+            "debian": 92,
+            "gobinary": 51
+          },
+          "vulnerabilities": {
+            "CRITICAL": 3,
+            "HIGH": 80,
+            "MEDIUM": 168,
+            "LOW": 91,
+            "UNKNOWN": 15
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 2,
+            "HIGH": 43,
+            "MEDIUM": 60,
+            "LOW": 4,
+            "UNKNOWN": 4
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244,
+            "gobinary": 113
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/seqkit:2.8.2--h9ee0642_1",
+          "digest": "sha256:548b9b2686a311feab2d6811d113f71211280ae42b9945d51060a9049b21600e",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 13164432,
+          "uncompressed_bytes": 42680959,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 51,
+          "packages_by_type": {
+            "gobinary": 51
+          },
+          "vulnerabilities": {
+            "CRITICAL": 2,
+            "HIGH": 43,
+            "MEDIUM": 60,
+            "LOW": 4,
+            "UNKNOWN": 4
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 2,
+            "HIGH": 43,
+            "MEDIUM": 60,
+            "LOW": 4,
+            "UNKNOWN": 4
+          },
+          "vulnerabilities_by_type": {
+            "gobinary": 113
+          }
+        },
+        "staphb": {
+          "ref": "staphb/seqkit:2.8.2",
+          "digest": "sha256:8eb09a52ae932f7c25cfbb8db0df7110567087a187c7e90d46f499962d1c82c9",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 4,
+          "compressed_bytes": 39319954,
+          "uncompressed_bytes": 150527407,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "ubuntu 22.04",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 157,
+          "packages_by_type": {
+            "gobinary": 51,
+            "ubuntu": 106
+          },
+          "vulnerabilities": {
+            "CRITICAL": 2,
+            "HIGH": 50,
+            "MEDIUM": 277,
+            "LOW": 117,
+            "UNKNOWN": 4
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 2,
+            "HIGH": 50,
+            "MEDIUM": 256,
+            "LOW": 100,
+            "UNKNOWN": 4
+          },
+          "vulnerabilities_by_type": {
+            "gobinary": 113,
+            "ubuntu": 337
+          }
+        }
+      }
+    },
+    {
+      "tool": "bedtools",
+      "version": "2.31.1",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/bedtools:2.31.1",
+          "digest": "sha256:c092e01b575534fc362ed8ad07c081b48685b7133b42716a7ca3651309455eeb",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 15,
+          "compressed_bytes": 46206535,
+          "uncompressed_bytes": 177557367,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 100,
+          "packages_by_type": {
+            "conda-pkg": 8,
+            "debian": 92
+          },
+          "vulnerabilities": {
+            "CRITICAL": 1,
+            "HIGH": 37,
+            "MEDIUM": 108,
+            "LOW": 87,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 244
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/bedtools:2.31.1--h13024bc_3",
+          "digest": "sha256:ffcd7aa5cd028e8156b8412cc4c88e4f7c4bfa44c4da24ac2737f82116940559",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 13938163,
+          "uncompressed_bytes": 49004964,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 0,
+          "packages_by_type": {},
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {}
+        },
+        "staphb": {
+          "ref": "staphb/bedtools:2.31.1",
+          "digest": "sha256:52d4a9359d3adaa6ac8f8ebbdc5596bae791a738974e9a85f72892486a43336e",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 4,
+          "compressed_bytes": 46824371,
+          "uncompressed_bytes": 180756473,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "ubuntu 22.04",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 105,
+          "packages_by_type": {
+            "ubuntu": 105
+          },
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 7,
+            "MEDIUM": 256,
+            "LOW": 132,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 7,
+            "MEDIUM": 235,
+            "LOW": 115,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "ubuntu": 395
+          }
+        }
+      }
+    },
+    {
+      "tool": "cutadapt",
+      "version": "5.2",
+      "images": {
+        "capsid": {
+          "ref": "ghcr.io/labiomics/capsid/cutadapt:5.2",
+          "digest": "sha256:356e8c10fb5ea3f1b5ca07df833de15ae08d39fb7f69fbc4f272e29169bbf4d3",
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ],
+          "layers": 18,
+          "compressed_bytes": 48311479,
+          "uncompressed_bytes": 195047712,
+          "user": "1000:1000",
+          "runs_as_root": false,
+          "cosign_signature": true,
+          "cosign_attestation": true,
+          "os": "debian 12.15",
+          "os_eosl": false,
+          "os_package_db": true,
+          "packages": 114,
+          "packages_by_type": {
+            "debian": 106,
+            "python-pkg": 8
+          },
+          "vulnerabilities": {
+            "CRITICAL": 2,
+            "HIGH": 99,
+            "MEDIUM": 147,
+            "LOW": 109,
+            "UNKNOWN": 11
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 5,
+            "LOW": 1,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "debian": 362,
+            "python-pkg": 6
+          }
+        },
+        "biocontainers": {
+          "ref": "quay.io/biocontainers/cutadapt:5.2--py312hfabe715_2",
+          "digest": "sha256:741216fb9a56cdac2a61e93c64f857bc5b3e1f9f2c123cf7ae2c6ea5c97702d8",
+          "platforms": [
+            "linux/amd64"
+          ],
+          "layers": 3,
+          "compressed_bytes": 82452157,
+          "uncompressed_bytes": 319201709,
+          "user": "root (unset)",
+          "runs_as_root": true,
+          "cosign_signature": false,
+          "cosign_attestation": false,
+          "os": "debian 12.5",
+          "os_eosl": false,
+          "os_package_db": false,
+          "packages": 22,
+          "packages_by_type": {
+            "python-pkg": 22
+          },
+          "vulnerabilities": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 2,
+            "LOW": 1,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_fixable": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 2,
+            "LOW": 1,
+            "UNKNOWN": 0
+          },
+          "vulnerabilities_by_type": {
+            "python-pkg": 3
+          }
+        }
+      }
+    }
+  ]
+}
