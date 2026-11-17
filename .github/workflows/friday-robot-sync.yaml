@@ -22,7 +22,7 @@ on:
 
 env:
   # Capsid engine version used by CI (commit SHA of LaBiOmicS/capsid)
-  CAPSID_REF: a98615e8d85e89e446dc39e48029e8a002079ab5
+  CAPSID_REF: 70dc45cefb06ff98e651a3147ee595d947cbc126
 
 permissions:
   contents: write
